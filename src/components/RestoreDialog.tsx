@@ -1,0 +1,12 @@
+import { useState } from 'react'
+import { Upload, ShieldCheck } from 'lucide-react'
+import { Modal } from './UI'
+import { parseBackup, restoreBackup, summarizeBackup } from '../lib/backup'
+import { tr } from '../lib/format'
+import type { Lang, PageProps, WorkspaceData } from '../types'
+
+export default function RestoreDialog({lang,onClose,onSave}:{lang:Lang;onClose:()=>void;onSave:PageProps['onSave']}) {
+  const [data,setData]=useState<WorkspaceData|null>(null)
+  const [filename,setFilename]=useState(''),[error,setError]=useState(''),[busy,setBusy]=useState(false)
+  return <Modal title={tr(lang,'Restore your records','Ibalik ang iyong mga tala')} onClose={onClose}><div className="section-gap"><p className="muted">{tr(lang,'Choose a PaSiBudget backup from your device. We will check it before adding copies of the records.','Pumili ng backup ng PaSiBudget mula sa device. Susuriin muna ito bago magdagdag ng mga kopya ng tala.')}</p><label className="button secondary full-width" htmlFor="welcome-restore"><Upload size={17}/>{tr(lang,'Choose backup file','Pumili ng backup file')}</label><input id="welcome-restore" type="file" className="visually-hidden" accept=".json,application/json" onChange={async e=>{const file=e.target.files?.[0];if(!file)return;setData(null);setError('');try{const parsed=parseBackup(await file.text());setData(parsed);setFilename(file.name)}catch{setError(tr(lang,'This is not a valid PaSiBudget backup. Nothing has changed.','Hindi ito wastong backup ng PaSiBudget. Walang nabago.'))}e.target.value=''}}/>{error&&<p role="alert" className="negative">{error}</p>}{data&&<><div className="notice"><ShieldCheck size={20}/><div><strong>{filename}</strong><p>{(()=>{const count=summarizeBackup(data);return tr(lang,`${count.farms} farms · ${count.seasons} seasons · ${count.expenses} expenses`,`${count.farms} sakahan · ${count.seasons} taniman · ${count.expenses} gastos`)})()}</p><p>{tr(lang,'Existing records are kept. Imported records receive new identifiers.','Mananatili ang kasalukuyang tala. Bibigyan ng bagong ID ang mga ibinalik na tala.')}</p></div></div><button className="button primary full-width" disabled={busy} onClick={async()=>{setBusy(true);const ok=await onSave(()=>restoreBackup(data),tr(lang,'Your records have been restored as copies.','Naibalik bilang mga kopya ang iyong mga tala.'));setBusy(false);if(ok)onClose()}}>{tr(lang,'Restore these records','Ibalik ang mga talang ito')}</button></>}</div></Modal>
+}

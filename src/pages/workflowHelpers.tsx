@@ -1,0 +1,43 @@
+import type { Category, CostKind, DecimalInput, Evidence, Lang } from '../types'
+import { categories, kinds } from '../types'
+import { categoryLabel, evidenceLabel, kindLabel, tr } from '../lib/format'
+
+export const decimalPattern = /^(?:\d+)(?:\.\d{1,2})?$/
+const MAX_INPUT = 1_000_000_000_000
+
+function validDecimal(value: string): boolean {
+  if (!decimalPattern.test(value)) return false
+  const amount = Number(value)
+  return Number.isFinite(amount) && amount <= MAX_INPUT
+}
+
+export function validAmount(value: DecimalInput): boolean {
+  return value === null || validDecimal(value)
+}
+
+export function validPositive(value: string): boolean {
+  return validDecimal(value) && Number(value) > 0
+}
+
+export const amountValue = (value: DecimalInput): number | null => value === null ? null : Number(value)
+
+export function categoryOptions(lang: Lang) {
+  return categories.map(category => <option key={category} value={category}>{categoryLabel(category, lang)}</option>)
+}
+
+export function kindOptions(lang: Lang) {
+  return kinds.map(kind => <option key={kind} value={kind}>{kindLabel(kind, lang)}</option>)
+}
+
+export function evidenceOptions(lang: Lang) {
+  const evidence: Evidence[] = ['estimate', 'recorded', 'quotation']
+  return evidence.map(item => <option key={item} value={item}>{evidenceLabel(item, lang)}</option>)
+}
+
+export function amountHelp(lang: Lang) {
+  return tr(lang, 'Leave blank when unknown. Enter 0 only when confirmed. Maximum: 1 trillion.', 'Iwang blangko kung hindi alam. Ilagay ang 0 kung nakumpirma lamang. Pinakamataas: 1 trilyon.')
+}
+
+export function joinExpenseLabels(category: Category, kind: CostKind, lang: Lang) {
+  return `${categoryLabel(category, lang)} · ${kindLabel(kind, lang)}`
+}
