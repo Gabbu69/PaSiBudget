@@ -27,3 +27,11 @@
   @media print { :root,:root[data-theme=dark]{color-scheme:light;--bg:white;--surface:white;--surface-soft:#f4f6f1;--text:#1a2920;--muted:#596756;--border:#ccd4c6;--green:#235f46;--negative:#8d3827;}body{background:white;color:#1a2920;}.sidebar,.topbar,.mobile-nav,.workspace-bar,.sample-note,.main-footer,.toast,.modal-backdrop,.update-bar,.button,.text-button,.icon-button,.form-actions,.heading-actions,input[type=file]{display:none!important;}.app-shell .main-wrap{margin-left:0;}.main-content{padding:0;max-width:none;}.page-heading h1{font-size:25px;}.grid-3{grid-template-columns:repeat(3,1fr);}.stat-card{padding:12px;display:block;}.stat-card>h2{font-size:20px;margin-top:10px;}.card{padding:15px;border-radius:0;break-inside:avoid;}.data-table{min-width:0;font-size:9px;}.data-table td{padding:8px 5px;}.data-table .amount{font-size:9px;}.table-wrap{overflow:visible;}.page-content{animation:none;}.notice{font-size:9px;padding:9px;}.section-gap{margin-top:14px;}@page{size:A4;margin:14mm;}}
 }
 .modal-fields { border: 0; margin: 0; padding: 0; min-width: 0; }
+.brand-emblem { display: block; flex-shrink: 0; object-fit: contain; border-radius: 24%; }
+.brand-mark { width: 40px; height: 40px; }
+.brand-mark .brand-emblem { width: 100%; height: 100%; }
+.main-footer .brand-emblem { width: 20px; height: 20px; }
+.boot-state > .brand-emblem { width: 64px; height: 64px; }
+.welcome-grain { background: none; }
+.welcome-grain > .brand-emblem { width: 64px; height: 64px; }
+@media (max-width: 600px) { .welcome-grain > .brand-emblem { width: 51px; height: 51px; } }

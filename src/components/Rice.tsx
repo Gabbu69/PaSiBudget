@@ -1,5 +1,5 @@
 export function RiceMark({ className = '' }: { className?: string }) {
-  return <svg className={className} viewBox="0 0 40 48" fill="none" aria-hidden="true"><path d="M20 43V11" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"/><path d="M20 34C9 34 7 25 7 21c8 0 13 4 13 13Zm0-9C9 25 9 16 9 13c7 1 11 5 11 12Zm0 9c11 0 13-9 13-13-8 0-13 4-13 13Zm0-9c11 0 11-9 11-12-7 1-11 5-11 12Zm0-10c-5-4-5-10 0-14 5 4 5 10 0 14Z" fill="currentColor"/></svg>
+  return <img className={`brand-emblem ${className}`.trim()} src="/brand/pasibudget-logo.png" width="48" height="48" alt="" aria-hidden="true" />
 }
 export function RiceGrain({ light }: { light: boolean }) {
   return <svg className={`theme-grain ${light ? 'open' : 'closed'}`} viewBox="0 0 56 44" fill="none" aria-hidden="true">
