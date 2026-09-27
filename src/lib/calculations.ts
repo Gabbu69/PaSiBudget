@@ -1,5 +1,6 @@
 import Decimal from 'decimal.js'
-import type { BudgetInput, BudgetItem, BudgetResult, CostResult, Expense, Scenario, Season } from '../types'
+import type { BudgetInput, BudgetItem, BudgetResult, CostResult, Expense, GrainCondition, Scenario, Season } from '../types'
+import { validPercent } from './validation'
 
 const zero = new Decimal(0)
 const numberPattern = /^\d+(?:\.\d+)?$/
@@ -19,9 +20,8 @@ function finiteNumber(value: Decimal): number {
 }
 
 function percent(value: string, field: string): Decimal {
-  if (typeof value !== 'string' || !/^-?\d+(?:\.\d+)?$/.test(value)) throw new Error(`${field} must be a finite percentage`)
+  if (!validPercent(value)) throw new Error(`${field} must be between -100 and 1000 percent`)
   const parsed = new Decimal(value)
-  if (!parsed.isFinite() || parsed.lt(-100)) throw new Error(`${field} must be at least -100`)
   return parsed.div(100).plus(1)
 }
 
@@ -46,26 +46,32 @@ function makeCost(items: BudgetItem[], quantity: Decimal | null, price: Decimal 
   let breakEvenQuantityStatus: CostResult['breakEvenQuantityStatus'] = 'unavailable'
   if (canConclude) {
     const margin = price.minus(variable)
-    if (margin.lte(0) && fixed.gt(0)) breakEvenQuantityStatus = 'impossible'
+    // The target is a positive-production break-even requirement. With P < v,
+    // every positive harvest loses money even when F = 0. When P = v and F = 0,
+    // every harvest returns zero, so F / (P - v) has no defined quantity target.
+    if (margin.lt(0) || (margin.eq(0) && fixed.gt(0))) breakEvenQuantityStatus = 'impossible'
     else if (margin.gt(0)) {
       breakEvenQuantity = finiteNumber(fixed.div(margin).toDecimalPlaces(2, Decimal.ROUND_CEIL))
-      breakEvenQuantityStatus = 'available'
-    } else if (fixed.eq(0)) {
-      breakEvenQuantity = 0
       breakEvenQuantityStatus = 'available'
     }
   }
   return { knownTotal: finiteNumber(knownTotal), complete: costsComplete, fixedCost: finiteNumber(fixed), variableRate: finiteNumber(variable), estimatedReturn, breakEvenPrice, breakEvenQuantity, breakEvenQuantityStatus }
 }
 
-export function calculateBudget(input: BudgetInput): BudgetResult {
+type CalculationInput = Omit<BudgetInput, 'grainCondition' | 'priceCondition'> & {
+  grainCondition: GrainCondition | null; priceCondition: GrainCondition | null
+}
+
+export function calculateBudget(input: CalculationInput): BudgetResult {
   const quantity = decimal(input.quantityKg, 'Quantity')
   const price = decimal(input.pricePerKg, 'Price')
-  const comparable = input.grainCondition === input.priceCondition
+  const conditionsKnown = input.grainCondition !== null && input.priceCondition !== null
+  const comparable = conditionsKnown && input.grainCondition === input.priceCondition
   const issues: string[] = []
   if (quantity === null) issues.push('Quantity is unknown')
   if (price === null) issues.push('Price is unknown')
-  if (!comparable) issues.push('Grain and price conditions do not match')
+  if (!conditionsKnown) issues.push('Grain or price condition is unknown')
+  else if (!comparable) issues.push('Grain and price conditions do not match')
   if (!input.complete) issues.push('Costs are marked incomplete')
   if (input.items.some(item => item.amount === null)) issues.push('Some costs are unknown')
   const productionValue = quantity !== null && price !== null && comparable ? finiteNumber(quantity.times(price)) : null
@@ -105,5 +111,5 @@ export function calculateRecorded(season: Season, expenses: Expense[]): BudgetRe
     id: expense.id, seasonId: expense.seasonId, name: expense.name, category: expense.category,
     kind: expense.kind, basis: 'fixed', amount: expense.amount, evidence: expense.evidence, notes: expense.notes,
   }))
-  return calculateBudget({ items, quantityKg: season.actualQuantityKg, pricePerKg: season.actualPricePerKg, grainCondition: season.grainCondition, priceCondition: season.priceCondition, complete: season.recordsComplete })
+  return calculateBudget({ items, quantityKg: season.actualQuantityKg, pricePerKg: season.actualPricePerKg, grainCondition: season.actualGrainCondition ?? null, priceCondition: season.actualPriceCondition ?? null, complete: season.recordsComplete })
 }

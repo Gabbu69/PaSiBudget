@@ -75,4 +75,11 @@ describe('transactional financial records', () => {
     await expect(saveReceiptRecord(receipt({ amount: '0.001' }))).rejects.toThrow()
     expect(await db.receipts.count()).toBe(0)
   })
+
+  it('enforces the supported sale-total limit without overwriting an existing sale', async () => {
+    const boundary = sale({ quantityKg: '1000000', pricePerKg: '1000000' })
+    await saveSaleRecord(boundary)
+    await expect(saveSaleRecord({ ...boundary, quantityKg: '1000000.01' })).rejects.toThrow(/1 trillion/)
+    expect(await db.sales.get(boundary.id)).toEqual(boundary)
+  })
 })

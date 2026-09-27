@@ -1,7 +1,7 @@
 import Dexie, { type Table } from 'dexie'
 import type { BudgetItem, Expense, Farm, Receipt, Sale, Scenario, Season, Setting, WorkspaceData } from '../types'
 
-class PaSiDatabase extends Dexie {
+export class PaSiDatabase extends Dexie {
   farms!: Table<Farm, string>
   seasons!: Table<Season, string>
   budgetItems!: Table<BudgetItem, string>
@@ -11,9 +11,9 @@ class PaSiDatabase extends Dexie {
   scenarios!: Table<Scenario, string>
   settings!: Table<Setting, string>
 
-  constructor() {
-    super('PaSiBudget')
-    this.version(1).stores({
+  constructor(name = 'PaSiBudget') {
+    super(name)
+    const stores = {
       farms: 'id, isSample',
       seasons: 'id, farmId, archived',
       budgetItems: 'id, seasonId',
@@ -22,6 +22,15 @@ class PaSiDatabase extends Dexie {
       receipts: 'id, seasonId, saleId, date',
       scenarios: 'id, seasonId',
       settings: 'key',
+    }
+    this.version(1).stores(stores)
+    this.version(2).stores(stores).upgrade(async transaction => {
+      // Earlier versions borrowed planned grain conditions for recorded figures.
+      // Those assumptions cannot establish the actual harvest's condition.
+      await transaction.table('seasons').toCollection().modify(season => {
+        season.actualGrainCondition = null
+        season.actualPriceCondition = null
+      })
     })
   }
 }
@@ -29,11 +38,13 @@ class PaSiDatabase extends Dexie {
 export const db = new PaSiDatabase()
 
 export async function loadWorkspace(): Promise<WorkspaceData> {
-  const [farms, seasons, budgetItems, expenses, sales, receipts, scenarios, settings] = await Promise.all([
-    db.farms.toArray(), db.seasons.toArray(), db.budgetItems.toArray(), db.expenses.toArray(),
-    db.sales.toArray(), db.receipts.toArray(), db.scenarios.toArray(), db.settings.toArray(),
-  ])
-  return { farms, seasons, budgetItems, expenses, sales, receipts, scenarios, settings }
+  return db.transaction('r', db.tables, async () => {
+    const [farms, seasons, budgetItems, expenses, sales, receipts, scenarios, settings] = await Promise.all([
+      db.farms.toArray(), db.seasons.toArray(), db.budgetItems.toArray(), db.expenses.toArray(),
+      db.sales.toArray(), db.receipts.toArray(), db.scenarios.toArray(), db.settings.toArray(),
+    ])
+    return { farms, seasons, budgetItems, expenses, sales, receipts, scenarios, settings }
+  })
 }
 
 export async function createSeason(farm: Farm, season: Season, items: BudgetItem[]): Promise<void> {

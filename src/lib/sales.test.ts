@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest'
-import { saleValue, sumMoney } from './sales'
+import { saleValue, sumMoney, validatedSaleValue } from './sales'
 
 it('rounds sale value to cents with half-up rounding', () => {
   expect(saleValue('100.25', '20.50')).toBe(2055.13)
@@ -17,4 +17,10 @@ it('rejects invalid sale and receipt decimals', () => {
   expect(() => saleValue('-1', '20')).toThrow()
   expect(() => sumMoney(['NaN'])).toThrow()
   expect(() => saleValue('9'.repeat(200), '9'.repeat(200))).toThrow()
+})
+
+it('accepts the transaction-total boundary and rejects a product above it before rounding', () => {
+  expect(validatedSaleValue('1000000', '1000000')).toBe(1000000000000)
+  expect(() => validatedSaleValue('1000000.01', '1000000')).toThrow(/1 trillion/)
+  expect(() => validatedSaleValue('1000000000000', '1000000000000')).toThrow(/1 trillion/)
 })

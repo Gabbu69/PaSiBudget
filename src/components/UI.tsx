@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useId, useRef } from 'react'
 import type { ReactNode } from 'react'
 import { X, Sprout } from 'lucide-react'
+import { lockDialogScroll } from '../lib/dialogScroll'
 
 export const SavingContext = createContext(false)
 
@@ -19,10 +20,11 @@ export function Modal({ title, onClose, children, wide = false }: { title: strin
   closeRef.current = () => { if (!saving) onClose() }
   useEffect(() => {
     const previous = document.activeElement as HTMLElement | null
-    const bodyOverflow = document.body.style.overflow; document.body.style.overflow = 'hidden'
+    const unlockScroll = lockDialogScroll()
     const dialog = ref.current
     const first = dialog?.querySelector<HTMLElement>('input,select,textarea,button'); first?.focus()
     const onKey = (e: KeyboardEvent) => {
+      if (document.querySelector('.confirmation-dialog')) return
       if (e.key === 'Escape') { e.preventDefault(); closeRef.current() }
       if (e.key === 'Tab' && dialog) {
         const elements = [...dialog.querySelectorAll<HTMLElement>('button:not(:disabled),input:not(:disabled),select:not(:disabled),textarea:not(:disabled),a[href],[tabindex="0"]')].filter(el => el.offsetParent !== null)
@@ -32,7 +34,7 @@ export function Modal({ title, onClose, children, wide = false }: { title: strin
       }
     }
     document.addEventListener('keydown', onKey)
-    return () => { document.body.style.overflow = bodyOverflow; document.removeEventListener('keydown', onKey); previous?.focus() }
+    return () => { unlockScroll(); document.removeEventListener('keydown', onKey); if (previous?.isConnected) previous.focus() }
   }, [])
   return <div className="modal-backdrop"><div ref={ref} role="dialog" aria-modal="true" aria-busy={saving} aria-labelledby={titleId} className={`modal ${wide ? 'wide' : ''}`}><div className="modal-header"><h2 id={titleId}>{title}</h2><button type="button" disabled={saving} onClick={onClose} className="icon-button" aria-label="Close / Isara"><X size={20} /></button></div><fieldset className="modal-fields" disabled={saving}>{children}</fieldset></div></div>
 }

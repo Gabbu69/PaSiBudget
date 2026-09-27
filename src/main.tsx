@@ -7,5 +7,6 @@ import '@fontsource/dm-sans/700.css'
 import App from './App'
 import ErrorBoundary from './components/ErrorBoundary'
 import './styles.css'
+import './polish.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><ErrorBoundary><App /></ErrorBoundary></React.StrictMode>)

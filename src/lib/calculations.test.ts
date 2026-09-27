@@ -47,6 +47,20 @@ describe('calculations', () => {
     expect(result.cash.breakEvenQuantityStatus).toBe('impossible')
   })
 
+  it('does not invent a quantity target when price exactly equals variable cost and fixed costs are zero', () => {
+    const result = calculateBudget(input([item('0'), item('20', 'cash', 'perKg')]))
+    expect(result.cash.estimatedReturn).toBe(0)
+    expect(result.cash.breakEvenQuantity).toBeNull()
+    expect(result.cash.breakEvenQuantityStatus).toBe('unavailable')
+  })
+
+  it('flags positive-production break-even as impossible below variable cost even with zero fixed costs', () => {
+    const result = calculateBudget(input([item('0'), item('21', 'cash', 'perKg')]))
+    expect(result.cash.estimatedReturn).toBe(-4000)
+    expect(result.cash.breakEvenQuantity).toBeNull()
+    expect(result.cash.breakEvenQuantityStatus).toBe('impossible')
+  })
+
   it('rounds break-even price upward to the next cent', () => {
     expect(calculateBudget(input([item('100')], '3', '50')).cash.breakEvenPrice).toBe(33.34)
   })
@@ -85,11 +99,20 @@ describe('calculations', () => {
   })
 
   it('uses recorded costs and actual production separately from planned budget', () => {
-    const season: Season = { id: 's', farmId: 'f', name: 'Wet', areaHa: '2', plantingDate: '2026-06-01', harvestDate: '2026-10-01', quantityKg: '9000', pricePerKg: '30', grainCondition: 'fresh', priceCondition: 'fresh', actualQuantityKg: '4000', actualPricePerKg: '20', budgetComplete: true, recordsComplete: true, archived: false, createdAt: '2026-01-01T00:00:00.000Z' }
+    const season: Season = { id: 's', farmId: 'f', name: 'Wet', areaHa: '2', plantingDate: '2026-06-01', harvestDate: '2026-10-01', quantityKg: '9000', pricePerKg: '30', grainCondition: 'fresh', priceCondition: 'fresh', actualQuantityKg: '4000', actualPricePerKg: '20', actualGrainCondition: 'fresh', actualPriceCondition: 'fresh', budgetComplete: true, recordsComplete: true, archived: false, createdAt: '2026-01-01T00:00:00.000Z' }
     const expense: Expense = { id: 'e', seasonId: 's', budgetItemId: null, date: '2026-06-01', name: 'Actual', category: 'other', kind: 'cash', amount: '70000', evidence: 'recorded', notes: '' }
     const result = calculateRecorded(season, [expense])
     expect(result.productionValue).toBe(80000)
     expect(result.full.estimatedReturn).toBe(10000)
     expect(result.full.breakEvenPrice).toBe(17.5)
+    expect(calculateRecorded({ ...season, grainCondition: 'dried', priceCondition: 'fresh' }, [expense])).toEqual(result)
+    const unknown = calculateRecorded({ ...season, actualGrainCondition: null, actualPriceCondition: null }, [expense])
+    expect(unknown.productionValue).toBeNull()
+    expect(unknown.full.estimatedReturn).toBeNull()
+    expect(unknown.full.knownTotal).toBe(70000)
+    expect(unknown.issues).toContain('Grain or price condition is unknown')
+    const mismatch = calculateRecorded({ ...season, actualGrainCondition: 'dried', actualPriceCondition: 'fresh' }, [expense])
+    expect(mismatch.productionValue).toBeNull()
+    expect(mismatch.full.breakEvenPrice).toBeNull()
   })
 })

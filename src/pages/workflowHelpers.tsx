@@ -2,22 +2,7 @@ import type { Category, CostKind, DecimalInput, Evidence, Lang } from '../types'
 import { categories, kinds } from '../types'
 import { categoryLabel, evidenceLabel, kindLabel, tr } from '../lib/format'
 
-export const decimalPattern = /^(?:\d+)(?:\.\d{1,2})?$/
-const MAX_INPUT = 1_000_000_000_000
-
-function validDecimal(value: string): boolean {
-  if (!decimalPattern.test(value)) return false
-  const amount = Number(value)
-  return Number.isFinite(amount) && amount <= MAX_INPUT
-}
-
-export function validAmount(value: DecimalInput): boolean {
-  return value === null || validDecimal(value)
-}
-
-export function validPositive(value: string): boolean {
-  return validDecimal(value) && Number(value) > 0
-}
+export { decimalPattern, validAmount, validPositive } from '../lib/validation'
 
 export const amountValue = (value: DecimalInput): number | null => value === null ? null : Number(value)
 

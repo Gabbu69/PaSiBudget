@@ -12,6 +12,7 @@ export interface Season {
   quantityKg: DecimalInput; pricePerKg: DecimalInput;
   grainCondition: GrainCondition; priceCondition: GrainCondition;
   actualQuantityKg: DecimalInput; actualPricePerKg: DecimalInput;
+  actualGrainCondition: GrainCondition | null; actualPriceCondition: GrainCondition | null;
   budgetComplete: boolean; recordsComplete: boolean; archived: boolean; createdAt: string
 }
 export interface BudgetItem {

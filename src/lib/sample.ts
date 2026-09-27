@@ -13,6 +13,7 @@ export async function createSampleWorkspace(): Promise<string> {
     id: crypto.randomUUID(), farmId: farm.id, name: 'Sample wet season 2026', areaHa: '2',
     plantingDate: '2026-06-15', harvestDate: '2026-10-15', quantityKg: '8000', pricePerKg: '22.50',
     grainCondition: 'fresh', priceCondition: 'fresh', actualQuantityKg: null, actualPricePerKg: null,
+    actualGrainCondition: null, actualPriceCondition: null,
     budgetComplete: true, recordsComplete: false, archived: false, createdAt: now,
   }
   const costRows = [

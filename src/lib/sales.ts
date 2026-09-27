@@ -1,4 +1,5 @@
 import Decimal from 'decimal.js'
+import { MAX_INPUT } from './validation'
 
 const signedDecimalPattern = /^-?\d+(?:\.\d+)?$/
 
@@ -17,6 +18,13 @@ function cents(value: Decimal): number {
 
 export function saleValue(quantityKg: string, pricePerKg: string): number {
   return cents(parseAmount(quantityKg, false).times(parseAmount(pricePerKg, false)))
+}
+
+/** Keep supported transaction totals within a range that preserves every cent. */
+export function validatedSaleValue(quantityKg: string, pricePerKg: string): number {
+  const total = parseAmount(quantityKg, false).times(parseAmount(pricePerKg, false))
+  if (total.gt(MAX_INPUT)) throw new Error('Sale total must not exceed 1 trillion pesos')
+  return cents(total)
 }
 
 export function sumMoney(amounts: string[]): number {
