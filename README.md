@@ -34,6 +34,8 @@ For development: `npm.cmd run dev` serves http://127.0.0.1:5173.
 - Switch themes with a ridged, angled rice grain: the husk opens for light mode and closes for dark mode. Keyboard and reduced-motion preferences are supported.
 - Keep unsaved form and scenario edits protected by an in-app discard dialog. Save failures retain inputs; application updates wait until work is saved or discarded.
 
+![Welcome screen in dark mode](docs/screenshots/welcome-desktop-dark.png)
+
 ![Desktop overview in light mode](docs/screenshots/overview-desktop-light.png)
 
 ![Mobile overview in Filipino and dark mode](docs/screenshots/overview-mobile-dark-fil.png)

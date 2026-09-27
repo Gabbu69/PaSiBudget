@@ -30,6 +30,8 @@ Tests verify actual-condition isolation, v1-to-v2 database migration without cha
 
 ## Visual evidence and limits
 
+The welcome-screen follow-up keeps the existing setup, sample and restore actions, with a three-step introduction, 52px primary controls and locally bundled rice artwork. Its build/type check and five targeted browser tests pass (sample navigation/themes, real-season separation, mobile Filipino/reduced motion, fresh-device restoration, and season archiving/copying). Visual review covers the 1440px desktop layout and 390/360px phone layouts in both themes, including Filipino wrapping and no horizontal overflow. Welcome screenshots are in `docs/screenshots/welcome-*.png`. No records or financial calculation rules were changed.
+
 The Overview season card was refreshed with a separate farm/location block, labeled seasonal facts, a prominent details action and bundled decorative rice artwork. The follow-up production build and 21 targeted browser tests pass, covering English/Filipino, both themes, 360/390/768/1440px layouts, unknown area and 200% reflow. The card was also inspected in the running preview at the user's marked 664px width and at phone/desktop widths. Existing saved sample records remain available after the app update. The revised Overview screenshots are in `docs/screenshots/`.
 
 Desktop and phone screenshots are stored in `docs/screenshots/`. The browser suite also generates screenshots and an A4 sample report in the ignored `test-results/` directory. All four A4 sample-report pages were rendered and visually checked. Currency amounts remain on one line, summary cards stay together, and ledger headings repeat across pages. Long user-entered notes and unusual printer settings may require a separate print preview check.

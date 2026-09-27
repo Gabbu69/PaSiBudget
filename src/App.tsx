@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useRegisterSW } from 'virtual:pwa-register/react'
-import { LayoutDashboard, Wallet, ReceiptText, SlidersHorizontal, FileText, ArrowRight, Plus, ChevronDown, Check, HardDrive, Settings, Download, Sprout, MapPin, X, Archive, RotateCcw, CloudOff, ExternalLink, Info } from 'lucide-react'
+import { LayoutDashboard, Wallet, ReceiptText, SlidersHorizontal, FileText, ArrowRight, Plus, ChevronDown, Check, HardDrive, Settings, Download, Sprout, X, Archive, RotateCcw, CloudOff, ExternalLink, Info } from 'lucide-react'
 import { db, loadWorkspace } from './lib/db'
 import { createSampleWorkspace } from './lib/sample'
 import { requestBackupDownload, backupReminderDue } from './lib/backupDownload'
@@ -9,11 +9,12 @@ import { BackupStatus } from './components/BackupStatus'
 import { EditGuardProvider, useEditGuard } from './components/EditGuard'
 import { tr } from './lib/format'
 import type { Lang, WorkspaceData, PageProps } from './types'
-import { FarmLandscape, RiceGrain, RiceMark } from './components/Rice'
+import { RiceGrain, RiceMark } from './components/Rice'
 import { Modal, SavingContext } from './components/UI'
 import SeasonDialog from './components/SeasonDialog'
 import RestoreDialog from './components/RestoreDialog'
 import OverviewPage from './pages/OverviewPage'
+import Welcome from './pages/Welcome'
 import BudgetPage from './pages/BudgetPage'
 import ExpensesPage from './pages/ExpensesPage'
 import ScenariosPage from './pages/ScenariosPage'
@@ -113,9 +114,6 @@ function WorkspaceApp({lang,setLang}:{lang:Lang;setLang:(value:Lang)=>void}) {
   </div></SavingContext.Provider>
 }
 function ArrowUpRightIcon(){return <ExternalLink size={14}/>}
-function Welcome({lang,onStart,onSample,busy,hasArchived,openSettings,onRestore}:{lang:Lang;onStart:()=>void;onSample:()=>void;busy:boolean;hasArchived:boolean;openSettings:()=>void;onRestore:()=>void}){
-  return <main className="welcome"><div className="welcome-intro"><span className="welcome-pill"><Sprout size={16}/>{tr(lang,'A LITTLE CLARITY FOR EVERY GROWING SEASON','LINAW SA BAWAT PANAHON NG PAGTATANIM')}</span><h1>{tr(lang,'Rooted in your farm.','Para sa iyong sakahan.')}<br/><em>{tr(lang,'Built for your future.','Para sa iyong kinabukasan.')}</em></h1><p>{tr(lang,'Your season has a lot of moving parts. Bring your budget, expenses, and harvest possibilities together in one simple place.','Maraming bahagi ang bawat taniman. Pagsamahin ang badyet, gastos, at posibleng ani sa isang madaling gamitin na talaan.')}</p><div className="welcome-features"><span><Check size={15}/>{tr(lang,'Works offline','Gumagana offline')}</span><span><Check size={15}/>{tr(lang,'No account needed','Walang kailangang account')}</span><span><Check size={15}/>{tr(lang,'Your records stay yours','Sa iyo ang iyong mga tala')}</span></div><div className="welcome-art"><FarmLandscape/><span><MapPin size={14}/>M’lang, North Cotabato</span></div></div><section className="welcome-card"><span className="welcome-grain"><RiceMark/></span><p className="eyebrow">{tr(lang,'LET’S GROW WITH A PLAN','SIMULAN SA ISANG PLANO')}</p><h2>{tr(lang,'A fresh start for your season.','Bagong simula para sa iyong taniman.')}</h2><p>{tr(lang,'Start with what you know. Add the details as you go.','Magsimula sa alam mo. Dagdagan ang detalye habang nagpapatuloy.')}</p><button className="button primary full-width" onClick={onStart}><Plus size={18}/>{tr(lang,'Plan my first season','Planuhin ang unang taniman')}<ArrowRight size={16}/></button><div className="welcome-or"><span/>{tr(lang,'OR TAKE A LOOK AROUND','O TUMINGIN MUNA')}<span/></div><button className="button secondary full-width" disabled={busy} onClick={onSample}><Sprout size={18}/>{busy?tr(lang,'Opening…','Binubuksan…'):tr(lang,'Explore a sample farm','Tingnan ang halimbawang sakahan')}</button><small>{tr(lang,'Try the full app with clearly labeled example data.','Subukan ang buong app gamit ang mga halimbawang tala.')}</small><div className="welcome-privacy"><HardDrive size={19}/><span>{tr(lang,'Saved in this browser, on this device. Back up your records to keep an extra copy.','Naka-save sa browser at device na ito. Mag-backup upang magkaroon ng ekstrang kopya.')}</span></div><button className="text-button restore-first" onClick={onRestore}><Download size={14}/>{tr(lang,'Restore a backup','Ibalik ang backup')}</button>{hasArchived&&<button className="text-button" onClick={openSettings}>{tr(lang,'Find archived seasons','Tingnan ang naka-archive na taniman')}<ArrowRight size={14}/></button>}</section></main>
-}
 function SettingsModal({data,lang,storage,onClose,onSave,onSample,onSelect,onPersist}:{data:WorkspaceData;lang:Lang;storage:{usage:number;persistent:boolean}|null;onClose:()=>void;onSave:PageProps['onSave'];onSample:()=>void;onSelect:(id:string)=>void;onPersist:()=>Promise<void>}){
   const [backing,setBacking]=useState(false)
   const guard=useEditGuard()
