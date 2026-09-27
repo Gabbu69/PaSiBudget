@@ -30,11 +30,13 @@ Tests verify actual-condition isolation, v1-to-v2 database migration without cha
 
 ## Visual evidence and limits
 
+The Overview season card was refreshed with a separate farm/location block, labeled seasonal facts, a prominent details action and bundled decorative rice artwork. The follow-up production build and 21 targeted browser tests pass, covering English/Filipino, both themes, 360/390/768/1440px layouts, unknown area and 200% reflow. The card was also inspected in the running preview at the user's marked 664px width and at phone/desktop widths. Existing saved sample records remain available after the app update. The revised Overview screenshots are in `docs/screenshots/`.
+
 Desktop and phone screenshots are stored in `docs/screenshots/`. The browser suite also generates screenshots and an A4 sample report in the ignored `test-results/` directory. All four A4 sample-report pages were rendered and visually checked. Currency amounts remain on one line, summary cards stay together, and ledger headings repeat across pages. Long user-entered notes and unusual printer settings may require a separate print preview check.
 
 Key text/background contrast pairs were calculated: light muted text ≥4.75:1, dark muted text ≥5.73:1, primary button text 7.46:1 and revised light gold labels 5.05:1. The light focus outline has at least 3.86:1 against the checked surfaces. These checks and keyboard tests are not a full WCAG audit or screen-reader evaluation.
 
-The build produces a bundled offline app. Vite reports a roughly 509 kB minified main JavaScript chunk (156 kB gzip); further code splitting and physical low-end-device performance evaluation remain possible follow-up work.
+The build produces a bundled offline app. Vite reports a roughly 512 kB minified main JavaScript chunk (157 kB gzip); further code splitting and physical low-end-device performance evaluation remain possible follow-up work.
 
 ## Delivery boundary
 

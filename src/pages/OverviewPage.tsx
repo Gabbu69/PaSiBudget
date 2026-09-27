@@ -1,7 +1,8 @@
-import { ArrowUpRight, ArrowRight, Plus, Wallet, CircleDollarSign, Wheat, TrendingUp, Check, AlertCircle, Sprout, CalendarDays } from 'lucide-react'
+import { ArrowUpRight, ArrowRight, Plus, Wallet, CircleDollarSign, Wheat, TrendingUp, Check, AlertCircle, Sprout, CalendarDays, MapPin, LandPlot } from 'lucide-react'
 import { calculateBudget, seasonInput } from '../lib/calculations'
 import { categoryLabel, money, number, tr, kindLabel } from '../lib/format'
-import { FarmLandscape } from '../components/Rice'
+import SeasonFieldArt from '../components/SeasonFieldArt'
+import './season-hero.css'
 import PlanChecklist from '../components/PlanChecklist'
 import { overviewFinances } from '../lib/overview'
 import { categories } from '../types'
@@ -26,7 +27,22 @@ export default function OverviewPage({ data, season, lang, navigate, editSeason,
     : season.recordsComplete ? tr(lang, 'Recorded costs marked complete.', 'Kumpirmadong kumpleto ang naitalang gastos.') : tr(lang, 'Recorded costs are still marked incomplete.', 'Hindi pa kumpirmadong kumpleto ang naitalang gastos.')
   return <>
     <div className="page-heading overview-heading"><div><div className="eyebrow">{tr(lang, 'YOUR FARM, AT A GLANCE', 'ISANG SULYAP SA IYONG SAKAHAN')}</div><h1>{tr(lang, 'Every season, a clearer plan.', 'Mas malinaw na plano sa bawat taniman.')}</h1><p className="muted">{tr(lang, 'A little clarity today. More confidence for the harvest.', 'Linaw sa pagpaplano ngayon. Kumpiyansa sa darating na ani.')}</p></div><button className="button primary" onClick={addExpense}><Plus size={17}/>{tr(lang, 'Add expense', 'Magtala ng gastos')}</button></div>
-    <section className="season-hero"><FarmLandscape className="hero-landscape"/><div className="hero-copy"><div className="hero-season"><span className="status-dot"/>{tr(lang, 'YOUR GROWING SEASON', 'IYONG KASALUKUYANG TANIMAN')}</div><h2>{season.name}</h2><p>{farm.name} <span>·</span> {number(season.areaHa===null?null:Number(season.areaHa), 2)} {tr(lang, 'hectares', 'ektarya')} <span>·</span> {farm.location}</p><div className="hero-details"><span><Sprout size={15}/>{season.grainCondition === 'fresh' ? tr(lang, 'Fresh palay', 'Basang palay') : tr(lang, 'Dried palay', 'Tuyong palay')}</span><span><CalendarDays size={15}/>{tr(lang, 'Harvest', 'Ani')} {harvestDate}</span></div><button className="hero-button" onClick={editSeason}>{tr(lang, 'View season details', 'Detalye ng taniman')}<ArrowUpRight size={16}/></button></div></section>
+    <section className="season-hero season-banner" aria-labelledby="season-summary-title">
+      <div className="season-art"><SeasonFieldArt/></div>
+      <div className="hero-copy">
+        <div className="season-heading-row"><span className="season-kicker"><Sprout size={16}/>{tr(lang, 'YOUR GROWING SEASON', 'IYONG KASALUKUYANG TANIMAN')}</span><span className="season-tag">{farm.isSample ? tr(lang, 'Sample', 'Halimbawa') : tr(lang, 'My season', 'Aking taniman')}</span></div>
+        <div className="season-intro">
+          <h2 id="season-summary-title">{season.name}</h2>
+          <div className="season-farm"><strong>{farm.name}</strong>{farm.location && <span><MapPin size={14}/>{farm.location}</span>}</div>
+          <button className="season-details-button" onClick={editSeason}>{tr(lang, 'View season details', 'Detalye ng taniman')}<ArrowUpRight size={17}/></button>
+        </div>
+        <dl className="season-facts">
+          <div><dt><LandPlot size={17}/>{tr(lang, 'Farm area', 'Lawak ng bukid')}</dt><dd>{number(season.areaHa===null?null:Number(season.areaHa), 2)} <span>{tr(lang, 'hectares', 'ektarya')}</span></dd></div>
+          <div><dt><Wheat size={17}/>{tr(lang, 'Grain condition', 'Kondisyon ng palay')}</dt><dd>{season.grainCondition === 'fresh' ? tr(lang, 'Fresh palay', 'Basang palay') : tr(lang, 'Dried palay', 'Tuyong palay')}</dd></div>
+          <div><dt><CalendarDays size={17}/>{tr(lang, 'Planned harvest', 'Planong ani')}</dt><dd>{harvestDate}</dd></div>
+        </dl>
+      </div>
+    </section>
     <div className="metrics-grid">
       <Metric icon={<Wallet size={19}/>} label={tr(lang, 'Planned cash budget', 'Planong salaping badyet')} value={money(calc.cash.knownTotal)} note={calc.cash.complete ? tr(lang, 'Cash costs for this season', 'Salaping gastos ngayong taniman') : tr(lang, 'Known subtotal · incomplete', 'Alam na subtotal · kulang')} accent="green"/>
       <Metric icon={<CircleDollarSign size={19}/>} label={tr(lang, 'Cash expenses recorded', 'Naitalang salaping gastos')} value={money(spent)} note={finances.cashAmountsKnown ? tr(lang, `${expenses.filter(expense => expense.kind === 'cash').length} cash entries · recorded so far`, `${expenses.filter(expense => expense.kind === 'cash').length} salaping tala · hanggang ngayon`) : tr(lang, 'Known subtotal · some cash amounts unknown', 'Alam na subtotal · may hindi pa alam na halaga')} accent="gold"/>
